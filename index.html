@@ -3,419 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AETHER // Nexus Media Hub</title>
+    <title>Media Nexus | Global Stream</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-main: #06070d;
-            --bg-surface: rgba(18, 20, 32, 0.7);
-            --bg-card: rgba(26, 29, 46, 0.45);
-            --border-glow: rgba(255, 75, 75, 0.2);
-            --accent: #ff4b4b;
-            --accent-gradient: linear-gradient(135deg, #ff4b4b 0%, #ff7b7b 100%);
-            --text-primary: #f0f2f5;
-            --text-secondary: #9aa5b5;
-            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            --glow: 0 0 20px rgba(255, 75, 75, 0.15);
-        }
-
-        body {
-            font-family: var(--font-stack);
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 75, 75, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(88, 166, 255, 0.03) 0%, transparent 40%);
-        }
-
-        .blur-backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            backdrop-filter: blur(100px);
-            z-index: -1;
-        }
-
-        .app-container {
-            width: 95%;
-            max-width: 1200px;
-            background: var(--bg-surface);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            box-sizing: border-box;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.05em;
-            margin: 0 0 10px 0;
-            background: linear-gradient(180deg, #ffffff 0%, #b5c2d4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        header p {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin: 0;
-            letter-spacing: 0.02em;
-        }
-
-        .search-wrapper {
-            position: relative;
-            display: flex;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 6px;
-            transition: all 0.3s ease;
-            margin-bottom: 30px;
-        }
-
-        .search-wrapper:focus-within {
-            border-color: var(--accent);
-            box-shadow: var(--glow);
-        }
-
-        .search-wrapper input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-primary);
-            padding: 14px 20px;
-            font-size: 1.1rem;
-        }
-
-        .search-wrapper input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .search-wrapper button {
-            background: var(--accent-gradient);
-            color: white;
-            border: none;
-            padding: 0 32px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-        }
-
-        .search-wrapper button:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 30px;
-            width: max-content;
-            transition: all 0.4s ease;
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        .status-pill.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .status-pill.searching { background: rgba(58, 134, 255, 0.1); color: #3a86ff; border: 1px solid rgba(58, 134, 255, 0.2); }
-        .status-pill.success { background: rgba(58, 240, 134, 0.1); color: #3af086; border: 1px solid rgba(58, 240, 134, 0.2); }
-        .status-pill.error { background: rgba(255, 75, 75, 0.1); color: #ff4b4b; border: 1px solid rgba(255, 75, 75, 0.2); }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 35px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .dashboard-grid.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .meta-panel {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .poster-frame {
-            position: relative;
-            width: 100%;
-            padding-top: 150%; /* 2:3 Aspect Ratio */
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .poster-frame img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .meta-info h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin: 0 0 6px 0;
-            color: var(--text-bright);
-            line-height: 1.3;
-        }
-
-        .meta-info .year-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.08);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .control-group label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
-        }
-
-        select {
-            background: #0d1117;
-            border: 1px solid rgba(255,255,255,0.08);
-            color: var(--text-primary);
-            padding: 12px;
-            border-radius: 10px;
-            outline: none;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-
-        select:focus {
-            border-color: var(--accent);
-        }
-
-        .cinema-container {
-            position: relative;
-            background: #000;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.7);
-            border: 1px solid rgba(255,255,255,0.04);
-            aspect-ratio: 16 / 9;
-        }
-
-        iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .shield-indicator {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(255, 75, 75, 0.04);
-            border: 1px solid rgba(255, 75, 75, 0.1);
-            border-radius: 12px;
-            padding: 14px 20px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
-            margin-top: 20px;
-        }
-
-        .shield-indicator strong {
-            color: var(--text-primary);
-        }
-
-        @media (max-width: 900px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .meta-panel {
-                flex-direction: row;
-                align-items: center;
-            }
-            .poster-frame {
-                width: 120px;
-                padding-top: 180px;
-            }
-        }
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        iframe { width: 100%; height: 500px; border-radius: 12px; border: none; }
     </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen items-center p-6">
 
-<div class="blur-backdrop"></div>
-
-<div class="app-container">
-    <header>
-        <h1>AETHER // NEXUS</h1>
-        <p>Decentralized Metadata Streaming Matrix</p>
-    </header>
-
-    <div class="search-wrapper">
-        <input type="text" id="targetQuery" placeholder="Search title or drop IMDb token... (e.g., Kalki 2898 AD)" onkeypress="if(event.key === 'Enter') executeDiscovery()">
-        <button onclick="executeDiscovery()">Discover</button>
+    <div class="w-full max-w-4xl text-center mb-10">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent mb-2">MEDIA NEXUS</h1>
+        <p class="text-slate-400">Cloud-Powered Universal Stream Engine</p>
     </div>
 
-    <div id="statusPill" class="status-pill"></div>
+    <div class="w-full max-w-2xl glass p-6 rounded-2xl shadow-2xl mb-8">
+        <div class="flex gap-2">
+            <input type="text" id="movieTitle" placeholder="Enter Movie or TV Show name..." 
+                class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button onclick="searchMovie()" class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-lg font-semibold transition">Search</button>
+        </div>
+        <p id="status" class="mt-3 text-sm text-slate-500"></p>
+    </div>
 
-    <div id="dashboardGrid" class="dashboard-grid">
-        <div class="meta-panel">
-            <div class="poster-frame">
-                <img id="metaPoster" src="" alt="Cinema Poster">
-            </div>
-            <div class="meta-info">
-                <h2 id="metaTitle">---</h2>
-                <span id="metaYear" class="year-badge">---</span>
-            </div>
+    <div id="playerContainer" class="w-full max-w-5xl hidden">
+        <div class="glass p-2 rounded-2xl">
+            <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+        </div>
+        <div class="flex flex-wrap gap-4 mt-6 justify-center">
+            <button onclick="switchServer('primary')" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm border border-slate-600">Server 1 (Auto)</button>
+            <button onclick="switchServer('mirror_alpha')" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm border border-slate-600">Server 2 (VidSrc)</button>
+            <button onclick="switchServer('mirror_beta')" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm border border-slate-600">Server 3 (EmbedSu)</button>
+        </div>
+    </div>
+
+    <script>
+        let currentEndpoints = {};
+        const API_BASE = "https://media-nexus-w8hw.onrender.com/api/v1";
+
+        async function searchMovie() {
+            const title = document.getElementById('movieTitle').value;
+            const status = document.getElementById('status');
+            const playerContainer = document.getElementById('playerContainer');
             
-            <div class="control-group">
-                <label for="nodeRouter">Routing Node</label>
-                <select id="nodeRouter" onchange="hotSwapNode()">
-                    <option value="autoembed">AutoEmbed Matrix</option>
-                    <option value="vidsrc">VidSrc Alpha</option>
-                    <option value="embedsu">Embed.su Cluster</option>
-                </select>
-            </div>
-        </div>
+            if(!title) return;
 
-        <div class="main-stage">
-            <div class="cinema-container">
-                <iframe id="cinemaIframe" sandbox="allow-scripts allow-same-origin allow-presentation" allowfullscreen></iframe>
-            </div>
-            <div class="shield-indicator">
-                <span>🛡️ <b>Sandboxed Framework Active:</b> Outbound frame permissions are programmatically neutralized. Tracking popups and layout redirects are destroyed at the engine layer. For absolute tracker suppression, deployment inside a <b>Brave</b> context or with <b>uBlock Origin</b> is advised.</span>
-            </div>
-        </div>
-    </div>
-</div>
+            status.innerText = "🔍 Connecting to cloud engine...";
+            status.classList.add('text-blue-400');
 
-<script>
-    let activeStreamData = { id: '', type: 'movie' };
+            try {
+                const response = await fetch(`${API_BASE}/resolve?title=${encodeURIComponent(title)}`);
+                const data = await response.json();
 
-    async function executeDiscovery() {
-        const query = document.getElementById('targetQuery').value.trim();
-        const pill = document.getElementById('statusPill');
-        const grid = document.getElementById('dashboardGrid');
-        const iframe = document.getElementById('cinemaIframe');
-
-        if (!query) return;
-
-        pill.className = "status-pill active searching";
-        pill.innerHTML = `<span>⏳</span> Querying decentralized indexes for "${query}"...`;
-        grid.classList.remove('visible');
-        iframe.src = '';
-
-        try {
-            const encoded = encodeURIComponent(query);
-            // Multi-Pipeline Search
-            let response = await fetch(`https://v3-cinemeta.strem.io/catalog/movie/top/search=${encoded}.json`);
-            let data = await response.json();
-            let matchedMeta = null;
-
-            if (data.metas && data.metas.length > 0) {
-                matchedMeta = data.metas[0];
-                activeStreamData.type = 'movie';
-            } else {
-                response = await fetch(`https://v3-cinemeta.strem.io/catalog/series/top/search=${encoded}.json`);
-                data = await response.json();
-                if (data.metas && data.metas.length > 0) {
-                    matchedMeta = data.metas[0];
-                    activeStreamData.type = 'tv';
+                if(response.ok) {
+                    currentEndpoints = data.endpoints;
+                    document.getElementById('videoPlayer').src = data.endpoints.primary;
+                    playerContainer.classList.remove('hidden');
+                    status.innerText = `✅ Found: ${data.title} (${data.media_type})`;
+                } else {
+                    status.innerText = "❌ Title not found in global database.";
                 }
+            } catch (err) {
+                status.innerText = "⚠️ Cloud Engine is waking up... try again in 10 seconds.";
             }
-
-            if (matchedMeta && matchedMeta.imdb_id) {
-                activeStreamData.id = matchedMeta.imdb_id;
-
-                // Bind modern UI attributes
-                document.getElementById('metaTitle').innerText = matchedMeta.name;
-                document.getElementById('metaYear').innerText = matchedMeta.releaseInfo || 'N/A';
-                document.getElementById('metaPoster').src = matchedMeta.poster || 'https://via.placeholder.com/300x450?text=No+Poster+Found';
-
-                pill.className = "status-pill active success";
-                pill.innerHTML = `<span>🎯</span> Connection established: ${matchedMeta.name}`;
-                
-                grid.classList.add('visible');
-                hotSwapNode();
-            } else {
-                pill.className = "status-pill active error";
-                pill.innerHTML = `<span>⚠️</span> Target resolution failure. Check title formatting.`;
-            }
-        } catch (err) {
-            pill.className = "status-pill active error";
-            pill.innerHTML = `<span>❌</span> Engine Pipeline Exception: ${err.message}`;
-        }
-    }
-
-    function hotSwapNode() {
-        if (!activeStreamData.id) return;
-
-        const node = document.getElementById('nodeRouter').value;
-        const iframe = document.getElementById('cinemaIframe');
-        let endpoint = '';
-
-        if (node === 'autoembed') {
-            endpoint = `https://autoembed.co/${activeStreamData.type}/imdb/${activeStreamData.id}`;
-        } else if (node === 'vidsrc') {
-            endpoint = `https://vidsrc.to/embed/${activeStreamData.type}/${activeStreamData.id}`;
-        } else if (node === 'embedsu') {
-            endpoint = `https://embed.su/embed/${activeStreamData.type}/${activeStreamData.id}`;
         }
 
-        iframe.src = endpoint;
-    }
-</script>
-
+        function switchServer(key) {
+            if(currentEndpoints[key]) {
+                document.getElementById('videoPlayer').src = currentEndpoints[key];
+            }
+        }
+    </script>
 </body>
 </html>
